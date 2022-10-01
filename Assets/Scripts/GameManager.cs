@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
     {
         // Starts the timer automatically
         timerIsRunning = true;
+
+        Instantiate(enemy);
+
     }
     void Awake()
     {

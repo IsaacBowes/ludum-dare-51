@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
     public GameObject stage2;
     public float timer;
     public float speed;
-    public LayerMask currentLayer;
+    //public string tag;
     public GameObject currentStage;
 
     // Start is called before the first frame update
@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour
         GameObject randStart = spawns[Random.Range(0, spawns.Length)].gameObject;
 
         stage1 = randStart;
+        stage2 = stage1.transform.Find("Stage2").gameObject;
         currentStage = stage1;
         transform.position = stage1.transform.position;
     }
@@ -26,6 +27,17 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            Stage2Enter();
+        }
     }
+
+    void Stage2Enter()
+    {
+        transform.position = stage2.transform.position;
+    }
+
+
+
 }
