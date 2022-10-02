@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public AudioClip[] lightningCrash;
     public AudioSource aS;
     public bool isPlaying;
+    public List<WindowScript> windowScripts = new();
 
     private void Start()
     {
@@ -27,7 +28,6 @@ public class GameManager : MonoBehaviour
         timerIsRunning = true;
         isPlaying = false;
         Instantiate(enemy);
-
         
 
     }
@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
         if (timerIsRunning)
         {
             currentTime += Time.deltaTime;
-            DisplayTime(currentTime);
+            //DisplayTime(currentTime);
 
             if (gameOver == true)
             {
@@ -73,19 +73,24 @@ public class GameManager : MonoBehaviour
 
     public void lightning()
     {
+        if (currentTime < 10f && currentTime >= 0f)
+        {
+            lighting.intensity = 0;
+
+        }
         if (currentTime >= 10f && currentTime < 10.5f)
         {
-            lighting.intensity = 1;
+            lighting.intensity = .1f;
             if (!isPlaying)
                 StartCoroutine(playSound());
         }
         if(currentTime >= 10.5f && currentTime < 11f)
         {
-            lighting.intensity = .1f;
+            lighting.intensity = 0f;
         }
         if (currentTime >= 11f && currentTime < 11.5f)
         {
-            lighting.intensity = 1;
+            lighting.intensity = .1f;
             if(!isPlaying)
                 StartCoroutine(playSound());
         }
