@@ -21,31 +21,14 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Find random spawn tagged stage1 then set enemy position to spawn position
-        GameObject[] spawns = GameObject.FindGameObjectsWithTag("Stage1");
-        GameObject randStart = spawns[Random.Range(0, spawns.Length)];
-        stage1 = randStart;
-        stage2 = stage1.transform.Find("Stage2").gameObject;
-        currentStage = stage1;
-        transform.position = stage1.transform.position;
+        stage1 = ws.stage1;
+        stage2 = ws.stage2;
         gm = FindObjectOfType<GameManager>();
         attackNoise = GetComponent<AudioSource>();
-        ws = gameObject.GetComponentInParent<WindowScript>();
-        transform.SetParent(ws.transform);
-        
-        //ws.enemies.Insert(0, gameObject);
-         
-        if (ws.enemies.Count >= ws.maxEnemies)
-        {
-            randStart = spawns[Random.Range(0, spawns.Length)];
-            stage1 = randStart;
-            Debug.Log("Full");
-        }
-        else
-            stage1 = randStart;
         
         ws.enemies.Add(gameObject);
         Stage1Enter();
+        gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -55,11 +38,21 @@ public class Enemy : MonoBehaviour
         {
             Stage2Enter();
         }
+
+        if(transform.position.x >= 0f)
+        {
+            GetComponent<SpriteRenderer>().flipX = true;
+        }
+        if (transform.position.x < 0f)
+        {
+            GetComponent<SpriteRenderer>().flipX = false;
+        }
     }
 
     public void Stage1Enter()
     {
-        float randXPos = Random.Range(stage1.transform.position.x - 1, stage1.transform.position.x + 1);
+        float randXPos = Random.Range(stage1.transform.position.x - 1f, stage1.transform.position.x + 1f);
+        currentStage = stage1;
         inStage1 = true;
         inStage2 = false;
         transform.position = new Vector3(randXPos, stage1.transform.position.y, stage1.transform.position.z);
@@ -68,7 +61,8 @@ public class Enemy : MonoBehaviour
 
     public void Stage2Enter()
     {
-        float randXPos = Random.Range(stage2.transform.position.x - 1, stage2.transform.position.x + 1);
+        float randXPos = Random.Range(stage2.transform.position.x - 1f, stage2.transform.position.x + 1f);
+        currentStage = stage2;
         inStage1 = false;
         inStage2 = true;
         transform.position = new Vector3(randXPos, stage2.transform.position.y, stage2.transform.position.z);

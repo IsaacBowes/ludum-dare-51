@@ -8,7 +8,7 @@ using UnityEngine.Rendering.Universal;
 public class GameManager : MonoBehaviour
 {
     public float currentTime = 0;
-    public GameObject enemy;
+    public GameObject[] enemyPrefabs;
     public bool gameOver;
     public bool created;
     public float timeRemaining = 0;
@@ -21,8 +21,9 @@ public class GameManager : MonoBehaviour
     public List<WindowScript> windowScripts = new();
     public List<Enemy> enemyScripts = new();
     public int amountToSpawn;
-    public int clickAmmo;
+    public int clickAmmo = 3;
     public int amountOfCycles;
+    public Text ammo;
 
 
     private void Start()
@@ -33,7 +34,10 @@ public class GameManager : MonoBehaviour
         timerIsRunning = true;
         isPlaying = false;
         Spawn(amountToSpawn);
-        
+        clickAmmo = 3;
+        amountToSpawn = 1;
+        amountOfCycles = 0;
+        currentTime = 0f;
 
     }
     void Awake()
@@ -50,6 +54,8 @@ public class GameManager : MonoBehaviour
     }
     void Update()
     {
+        ammo.text = clickAmmo.ToString();
+
         Lightning();
 
         //Timer Count up
@@ -82,23 +88,31 @@ public class GameManager : MonoBehaviour
         if (currentTime < 10f && currentTime >= 0f)
         {
             lighting.intensity = 0;
-            foreach (WindowScript ws in windowScripts)
-            {
-                ws.CheckForEnemies();
-            }
         }
         if (currentTime >= 10f && currentTime < 10.25f)
         {
+            foreach (Enemy e in enemyScripts)
+            {
+                e.gameObject.SetActive(true);
+            }
             lighting.intensity = .1f;
             if (!isPlaying)
                 StartCoroutine(playSound());
         }
         if(currentTime >= 10.25f && currentTime < 10.85f)
         {
+            foreach (Enemy e in enemyScripts)
+            {
+                e.gameObject.SetActive(false);
+            }
             lighting.intensity = 0f;
         }
         if (currentTime >= 10.85f && currentTime < 11f)
         {
+            foreach(Enemy e in enemyScripts)
+            {
+                e.gameObject.SetActive(true);
+            }
             lighting.intensity = .1f;
             if(!isPlaying)
                 StartCoroutine(playSound());
@@ -107,6 +121,10 @@ public class GameManager : MonoBehaviour
         {
             lighting.intensity = 0f;
             currentTime = 0f;
+            foreach (WindowScript ws in windowScripts)
+            {
+                ws.CheckForEnemies();
+            }
             foreach (Enemy e in enemyScripts)
             {
                 bool flash = true;
@@ -115,28 +133,80 @@ public class GameManager : MonoBehaviour
                     Debug.Log(e.gameObject + " is approaching");
                     e.Stage2Enter();
                     flash = false;
+                    e.gameObject.SetActive(false);
                 }
                 if (e.inStage2 && !e.finalFlash && flash)
                 {
                     Debug.Log(e.gameObject + " is ready to strike");
                     e.finalFlash = true;
                     flash = false;
+                    e.gameObject.SetActive(false);
                 }
                 if (e.inStage2 && e.finalFlash && flash)
                 {
                     e.GameOver();
                     flash = false;
                 }
+                e.gameObject.SetActive(false);
             }
             foreach(WindowScript ws in windowScripts)
             {
                 ws.amountOfClicks = 0;
             }
+            amountOfCycles++;
+            if (amountOfCycles == 1)
+            {
+                amountToSpawn = 1;
+            }
+            if (amountOfCycles == 2)
+            {
+                amountToSpawn = 1;
+            }
+            if (amountOfCycles == 3)
+            {
+                amountToSpawn = 2;
+            }
+            if (amountOfCycles == 4)
+            {
+                amountToSpawn = 2;
+            }
+            if (amountOfCycles == 5)
+            {
+                amountToSpawn = 3;
+            }
+            if (amountOfCycles == 10)
+            {
+                amountToSpawn = 4;
+            }
+            if (amountOfCycles == 15)
+            {
+                amountToSpawn = 5;
+            }
+            if (amountOfCycles == 20)
+            {
+                amountToSpawn = 6;
+            }
+            if (amountOfCycles == 25)
+            {
+                amountToSpawn = 7;
+            }
+            if (amountOfCycles == 30)
+            {
+                amountToSpawn = 8;
+            }
+            if (amountOfCycles == 40)
+            {
+                amountToSpawn = 9;
+            }
+            if (amountOfCycles == 50)
+            {
+                amountToSpawn = 10;
+            }
+
 
             Spawn(amountToSpawn);
         }
     }
-
 
     IEnumerator playSound()
     {
@@ -154,22 +224,21 @@ public class GameManager : MonoBehaviour
 
     void Spawn(int num)
     {
-        WindowScript randWS = windowScripts[Random.Range(0, windowScripts.Count)];
-        Debug.Log("Attempting to spawn " + num + " enemies at" + randWS);
-
         for(int i = 0; i < num; i++)
         {
-            Debug.Log("Entered Loop");
+            WindowScript randWS = windowScripts[Random.Range(0, windowScripts.Count)];
+            Debug.Log("Attempting to spawn " + num + " enemies at" + randWS);
             if (randWS.enemyCount >= randWS.maxEnemies)
             {
                 Debug.Log(randWS + " is full, finding another window");
             }
             else if (randWS.enemyCount < randWS.maxEnemies)
             {
-                GameObject clone = Instantiate(enemy, randWS.transform);
+                GameObject randObj = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+                GameObject clone = Instantiate(randObj, randWS.transform);
                 enemyScripts.Add(clone.GetComponent<Enemy>());
                 Debug.Log("Enemy Created at: " + randWS);
-                //clone.GetComponent<Enemy>().Stage1Enter();
+                clone.GetComponent<Enemy>().ws = randWS;
             }
         }
 

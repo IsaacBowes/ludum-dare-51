@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Stage1
   - Stage2
+  - Window
   layers:
   - Default
   - TransparentFX

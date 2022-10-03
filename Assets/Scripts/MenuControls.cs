@@ -31,4 +31,13 @@ public class MenuControls : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
     }
+
+    public void IsaacWebsite()
+    {
+        Application.OpenURL("https://www.isaacbowes.com/");
+    }
+    public void IsaacItch()
+    {
+        Application.OpenURL("https://isaacbowes.itch.io/");
+    }
 }
