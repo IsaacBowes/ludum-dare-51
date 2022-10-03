@@ -6,8 +6,6 @@ public class Enemy : MonoBehaviour
 {
     public GameObject stage1;
     public GameObject stage2;
-    public float timer;
-    public float speed;
     public int flashes;
     public bool finalFlash;
     public bool inStage2;

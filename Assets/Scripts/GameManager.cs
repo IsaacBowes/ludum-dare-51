@@ -4,13 +4,13 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public float currentTime = 0;
     public GameObject[] enemyPrefabs;
     public bool gameOver;
-    public bool created;
     public float timeRemaining = 0;
     public bool timerIsRunning = false;
     public TextMeshPro timeText;
@@ -39,18 +39,6 @@ public class GameManager : MonoBehaviour
         amountOfCycles = 0;
         currentTime = 0f;
 
-    }
-    void Awake()
-    {
-        if (!created)
-        {
-            DontDestroyOnLoad(this.gameObject);
-            created = true;
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
     }
     void Update()
     {
@@ -121,6 +109,7 @@ public class GameManager : MonoBehaviour
         {
             lighting.intensity = 0f;
             currentTime = 0f;
+            clickAmmo = clickAmmo + 1;
             foreach (WindowScript ws in windowScripts)
             {
                 ws.CheckForEnemies();
@@ -146,6 +135,7 @@ public class GameManager : MonoBehaviour
                 {
                     e.GameOver();
                     flash = false;
+                    SceneManager.LoadScene("EndScreen");
                 }
                 e.gameObject.SetActive(false);
             }
@@ -243,5 +233,7 @@ public class GameManager : MonoBehaviour
         }
 
     }
+
+    
 
 }

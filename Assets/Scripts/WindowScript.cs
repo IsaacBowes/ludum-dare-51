@@ -21,6 +21,7 @@ public class WindowScript : MonoBehaviour
         stage1 = transform.Find("Stage1").gameObject;
         stage2 = stage1.transform.Find("Stage2").gameObject;
         maxEnemies = 3;
+        amountOfClicks = 0;
     }
 
     void OnMouseDown()
@@ -43,47 +44,50 @@ public class WindowScript : MonoBehaviour
 
     public void CheckForEnemies()
     {
-        if (amountOfClicks >= enemyCount && enemyCount >= 1 || amountOfClicks <= enemyCount && enemyCount >= 1)
+        if (amountOfClicks >= 1)
         {
-            foreach(GameObject enemy in enemies)
+            if (amountOfClicks >= enemyCount && enemyCount >= 1 || amountOfClicks <= enemyCount && enemyCount >= 1)
             {
-                Debug.Log("11111");
-                if (enemy.GetComponent<Enemy>().currentStage == stage2)
+                foreach (GameObject enemy in enemies)
                 {
-                    gm.clickAmmo++;
-                    enemies.Remove(enemy);
-                    gm.enemyScripts.Remove(enemy.GetComponent<Enemy>());
-                    Destroy(enemy);
-                    Debug.Log("Destroying enemies " + enemy);
-                    break;
-                }
-                if (enemy.GetComponent<Enemy>().currentStage == stage1)
-                {
-                    gm.clickAmmo++;
-                    enemies.Remove(enemy);
-                    gm.enemyScripts.Remove(enemy.GetComponent<Enemy>());
-                    Destroy(enemy);
-                    Debug.Log("Destroying enemies " + enemy);
-                    break;
+                    Debug.Log("11111");
+                    if (enemy.GetComponent<Enemy>().currentStage == stage2)
+                    {
+                        gm.clickAmmo = gm.clickAmmo + 1;
+                        enemies.Remove(enemy);
+                        gm.enemyScripts.Remove(enemy.GetComponent<Enemy>());
+                        Destroy(enemy);
+                        Debug.Log("Destroying enemies " + enemy);
+                        break;
+                    }
+                    if (enemy.GetComponent<Enemy>().currentStage == stage1)
+                    {
+                        gm.clickAmmo = gm.clickAmmo + 1;
+                        enemies.Remove(enemy);
+                        gm.enemyScripts.Remove(enemy.GetComponent<Enemy>());
+                        Destroy(enemy);
+                        Debug.Log("Destroying enemies " + enemy);
+                        break;
+                    }
                 }
             }
-        }
-        else if (amountOfClicks < enemyCount && enemyCount >= 1)
-        {
-            foreach (GameObject enemy in enemies)
+            else if (amountOfClicks < enemyCount && enemyCount >= 1)
             {
-                Debug.Log("22222");
-                if (enemy == stage2)
+                foreach (GameObject enemy in enemies)
                 {
-                    Debug.Log("Defeated by: " + enemy);
-                    gm.gameOver = true;
+                    Debug.Log("22222");
+                    if (enemy == stage2)
+                    {
+                        Debug.Log("Defeated by: " + enemy);
+                        gm.gameOver = true;
+                    }
+                    if (enemy.GetComponent<Enemy>().currentStage == stage1)
+                    {
+                        break;
+                    }
                 }
-                if (enemy.GetComponent<Enemy>().currentStage == stage1)
-                {
-                    break;
-                }
-            }
 
+            }
         }
     }
 }
