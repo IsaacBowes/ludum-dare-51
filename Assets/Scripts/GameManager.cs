@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour
     public AudioSource aS;
     public bool isPlaying;
     public List<WindowScript> windowScripts = new();
+    public List<Enemy> enemyScripts = new();
+    public int amountToSpawn;
+    public int clickAmmo;
+    public int amountOfCycles;
+
 
     private void Start()
     {
@@ -27,7 +32,7 @@ public class GameManager : MonoBehaviour
         // Starts the timer automatically
         timerIsRunning = true;
         isPlaying = false;
-        Instantiate(enemy);
+        Spawn(amountToSpawn);
         
 
     }
@@ -45,7 +50,7 @@ public class GameManager : MonoBehaviour
     }
     void Update()
     {
-        lightning();
+        Lightning();
 
         //Timer Count up
         if (timerIsRunning)
@@ -55,9 +60,10 @@ public class GameManager : MonoBehaviour
 
             if (gameOver == true)
             {
-                Debug.Log("Time has stopped!");
+                Debug.Log("Time has stopped! You Lose");
                 timeRemaining = timeRemaining;
                 timerIsRunning = false;
+
             }
         }
     }
@@ -71,33 +77,63 @@ public class GameManager : MonoBehaviour
         timeText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-    public void lightning()
+    public void Lightning()
     {
         if (currentTime < 10f && currentTime >= 0f)
         {
             lighting.intensity = 0;
-
+            foreach (WindowScript ws in windowScripts)
+            {
+                ws.CheckForEnemies();
+            }
         }
-        if (currentTime >= 10f && currentTime < 10.5f)
+        if (currentTime >= 10f && currentTime < 10.25f)
         {
             lighting.intensity = .1f;
             if (!isPlaying)
                 StartCoroutine(playSound());
         }
-        if(currentTime >= 10.5f && currentTime < 11f)
+        if(currentTime >= 10.25f && currentTime < 10.85f)
         {
             lighting.intensity = 0f;
         }
-        if (currentTime >= 11f && currentTime < 11.5f)
+        if (currentTime >= 10.85f && currentTime < 11f)
         {
             lighting.intensity = .1f;
             if(!isPlaying)
                 StartCoroutine(playSound());
         }
-        if (currentTime >= 11.5f)
+        if (currentTime >= 11f)
         {
-            lighting.intensity = .1f;
+            lighting.intensity = 0f;
             currentTime = 0f;
+            foreach (Enemy e in enemyScripts)
+            {
+                bool flash = true;
+                if (e.inStage1 && flash)
+                {
+                    Debug.Log(e.gameObject + " is approaching");
+                    e.Stage2Enter();
+                    flash = false;
+                }
+                if (e.inStage2 && !e.finalFlash && flash)
+                {
+                    Debug.Log(e.gameObject + " is ready to strike");
+                    e.finalFlash = true;
+                    flash = false;
+                }
+                if (e.inStage2 && e.finalFlash && flash)
+                {
+                    e.GameOver();
+                    flash = false;
+                }
+            }
+            foreach(WindowScript ws in windowScripts)
+            {
+                ws.amountOfClicks = 0;
+            }
+
+            Spawn(amountToSpawn);
         }
     }
 
@@ -115,4 +151,28 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(aS.clip.length);
         isPlaying = false;
     }
+
+    void Spawn(int num)
+    {
+        WindowScript randWS = windowScripts[Random.Range(0, windowScripts.Count)];
+        Debug.Log("Attempting to spawn " + num + " enemies at" + randWS);
+
+        for(int i = 0; i < num; i++)
+        {
+            Debug.Log("Entered Loop");
+            if (randWS.enemyCount >= randWS.maxEnemies)
+            {
+                Debug.Log(randWS + " is full, finding another window");
+            }
+            else if (randWS.enemyCount < randWS.maxEnemies)
+            {
+                GameObject clone = Instantiate(enemy, randWS.transform);
+                enemyScripts.Add(clone.GetComponent<Enemy>());
+                Debug.Log("Enemy Created at: " + randWS);
+                //clone.GetComponent<Enemy>().Stage1Enter();
+            }
+        }
+
+    }
+
 }
